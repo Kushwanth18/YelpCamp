@@ -6,6 +6,8 @@ const ejsMate = require("ejs-mate");
 const path = require("path");
 const ExpressError = require("./utils/ExpressError");
 const joi = require("joi");
+const session = require("express-session");
+const flash = require("connect-flash");
 
 const campgrounds = require("./routes/campgrounds");
 const reviews = require("./routes/reviews");
@@ -25,6 +27,25 @@ app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
+const sessionConfig = {
+  secret: "thisshouldbeabettersecret",
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+  },
+};
+app.use(session(sessionConfig));
+app.use(flash());
+
+//access flash in our templates
+app.use((req, res, next) => {
+  res.locals.success = req.flash("success");
+  res.locals.error = req.flash("error");
+  next();
+});
 
 //parsing req.body
 app.use(express.urlencoded({ extended: true }));
