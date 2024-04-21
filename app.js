@@ -33,7 +33,7 @@ app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "public")));
 //parsing req.body
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan("tiny"));
+//app.use(morgan("tiny"));
 const sessionConfig = {
   secret: "thisshouldbeabettersecret",
   resave: false,
@@ -57,6 +57,11 @@ passport.deserializeUser(User.deserializeUser());
 
 //access flash in our templates
 app.use((req, res, next) => {
+  /*   if (!["/login", "/"].includes(req.originalUrl)) {
+    req.session.returnTo = req.originalUrl;
+  } */
+  console.log(req.session);
+  res.locals.currentUser = req.user;
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
   next();

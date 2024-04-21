@@ -6,7 +6,7 @@ const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground"); //importing the DB Schema
 const Review = require("../models/review");
 const { campgroundSchema, reviewSchema } = require("../schemas");
-const isLoggedIn = require("../middleware");
+const { isLoggedIn } = require("../middleware");
 
 const validateCampground = (req, res, next) => {
   const { err } = campgroundSchema.validate(req.body);
