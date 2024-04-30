@@ -6,33 +6,12 @@ const ExpressError = require("../utils/ExpressError");
 const Campground = require("../models/campground"); //importingd the DB Schema
 const Review = require("../models/review");
 const { campgroundSchema, reviewSchema } = require("../schemas");
+const reviews = require("../controllers/reviews");
 
 const { isLoggedIn, isAuthor, validateReview } = require("../middleware");
 
-router.post(
-  "/",
-  isLoggedIn,
-  validateReview,
-  catchAsync(async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-    req.flash("success", "Created a new Review!");
-    res.redirect(`/campgrounds/${campground._id}`);
-  })
-);
+router.post("/", isLoggedIn, validateReview, catchAsync(reviews.createReview));
 
-router.delete(
-  "/:reviewId",
-  catchAsync(async (req, res) => {
-    const { id, reviewId } = req.params;
-    await Campground.findByIdAndUpdate(id, { $pull: { reviews: reviewId } });
-    await Review.findByIdAndDelete(reviewId);
-    req.flash("success", "Successfully Deleted Review!");
-    res.redirect(`/campgrounds/${id}`);
-  })
-);
+router.delete("/:reviewId", catchAsync(reviews.deleteReview));
 
 module.exports = router;
